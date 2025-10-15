@@ -17,8 +17,10 @@ def create_app(config_class=Config):
     from .api.auth import auth_bp
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     
-    # 可以在这里注册其他蓝图，比如帖子的
-    # from .api.posts import posts_bp
-    # app.register_blueprint(posts_bp, url_prefix='/api/posts')
+    # --- 新增这部分 ---
+    from .api.posts import posts_bp
+    app.register_blueprint(posts_bp, url_prefix='/api/posts')
+    # --- 新增结束 ---
+    
 
     return app
