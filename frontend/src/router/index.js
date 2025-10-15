@@ -1,20 +1,24 @@
+// frontend/src/router/index.js
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+// 导入我们新建的视图组件
+import RegisterView from "../views/Register.vue";
+import LoginView from "../views/Login.vue";
 
 const routes = [
   {
-    path: "/",
-    name: "home",
-    component: HomeView,
+    path: "/register",
+    name: "register",
+    component: RegisterView,
   },
   {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
+    path: "/login",
+    name: "login",
+    component: LoginView,
+  },
+  // 我们可以加一个根路径重定向
+  {
+    path: "/",
+    redirect: "/login", // 暂时先让根路径跳转到登录页
   },
 ];
 
