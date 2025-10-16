@@ -44,7 +44,7 @@ def delete_post(id):
     post = Post.query.get_or_404(id)
     current_user_id = get_jwt_identity()
     
-    if post.user_id != current_user_id:
+    if str(post.user_id) != current_user_id:
         return jsonify({'message': 'Permission denied'}), 403
         
     db.session.delete(post)
