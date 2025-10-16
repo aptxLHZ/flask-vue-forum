@@ -58,14 +58,14 @@ export default createStore({
     // --- auth actions ---
     // 异步操作 (比如 API 请求)，通过 commit mutations 来修改 state
     async login({ commit }, userData) {
-      const response = await axios.post("/api/auth/login", userData);
+      const response = await axios.post("/auth/login", userData);
       const token = response.data.access_token;
       localStorage.setItem("token", token); // 将 token 存入 localStorage，防止刷新丢失
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`; // 设置全局请求头
       commit("AUTH_SUCCESS", token);
     },
     async register(_, userData) {
-      await axios.post("/api/auth/register", userData);
+      await axios.post("/auth/register", userData);
     },
     logout({ commit }) {
       localStorage.removeItem("token");
@@ -74,29 +74,29 @@ export default createStore({
     },
     // --- new post actions ---
     async fetchPosts({ commit }) {
-      const response = await axios.get("/api/posts/");
+      const response = await axios.get("/posts/");
       commit("SET_POSTS", response.data);
     },
     async fetchPost({ commit }, postId) {
       // 在获取新帖子详情前，清空旧数据
       commit("SET_POST", null);
       commit("SET_COMMENTS", []);
-      const response = await axios.get(`/api/posts/${postId}`);
+      const response = await axios.get(`/posts/${postId}`);
       commit("SET_POST", response.data);
     },
     async fetchComments({ commit }, postId) {
-      const response = await axios.get(`/api/posts/${postId}/comments`);
+      const response = await axios.get(`/posts/${postId}/comments`);
       commit("SET_COMMENTS", response.data);
     },
     // --- 新增 Actions ---
     async createPost({ commit, dispatch }, postData) {
-      const response = await axios.post("/api/posts/", postData);
+      const response = await axios.post("/posts/", postData);
       commit("ADD_POST", response.data);
       dispatch("setNotification", "帖子发布成功！");
     },
     async deletePost({ commit, dispatch }, postId) {
       try {
-        await axios.delete(`/api/posts/${postId}`);
+        await axios.delete(`/posts/${postId}`);
         commit("REMOVE_POST", postId);
         dispatch("setNotification", "帖子删除成功！");
       } catch (error) {
