@@ -1,7 +1,13 @@
 <template>
   <div class="home-container">
-    <!-- 添加这个调试用的标题 -->
-    <h1 style="color: red; border: 2px solid red">论坛首页</h1>
+    <div class="header">
+      <h1>论坛首页</h1>
+      <!-- 只有登录后才显示此按钮 -->
+      <router-link v-if="isLoggedIn" :to="{ name: 'createPost' }">
+        <button>发布新帖子</button>
+      </router-link>
+    </div>
+    <!-- <h1 style="color: red; border: 2px solid red">论坛首页</h1> -->
     <div v-if="posts.length">
       <div v-for="post in posts" :key="post.id" class="post-item">
         <!-- 使用 router-link 跳转到帖子详情页 -->
@@ -21,13 +27,14 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
   name: "HomeView",
   computed: {
     // 使用 mapState 辅助函数将 store 中的 posts 映射到组件的 computed 属性
     ...mapState(["posts"]),
+    ...mapGetters(["isLoggedIn"]), // 映射 getter
   },
   methods: {
     ...mapActions(["fetchPosts"]),
@@ -64,5 +71,14 @@ export default {
 }
 .post-item a:hover {
   text-decoration: underline;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.header h1 {
+  margin: 0;
 }
 </style>

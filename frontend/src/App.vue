@@ -1,5 +1,10 @@
 frontend/src/App.vue
 <template>
+  <!-- 全局通知 -->
+  <div v-if="notification" class="notification">
+    {{ notification }}
+  </div>
+
   <div id="nav">
     <router-link to="/">首页</router-link>|
     <span v-if="isLoggedIn">
@@ -16,11 +21,12 @@ frontend/src/App.vue
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions, mapState } from "vuex";
 
 export default {
   computed: {
     ...mapGetters(["isLoggedIn"]),
+    ...mapState(["notification"]), // 映射 notification state
   },
   methods: {
     ...mapActions(["logout"]),
@@ -50,5 +56,17 @@ export default {
 }
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+/* 通知样式 */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #42b983;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 </style>

@@ -2,6 +2,11 @@
 import { createStore } from "vuex";
 import axios from "axios";
 
+// --- 在这里添加 baseURL 的配置 ---
+// 这样，此文件中所有使用 axios 的请求都会自动带上这个前缀
+axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
+// ------------------------------------
+
 export default createStore({
   state: {
     // 存放状态的地方 (类似组件的 data)
@@ -11,6 +16,7 @@ export default createStore({
     posts: [], // 帖子列表
     post: null, // 单个帖子详情
     comments: [], // 单个帖子的评论列表
+    notification: null, // 新增：用于全局通知
   },
   mutations: {
     // --- auth mutations ---
@@ -31,6 +37,21 @@ export default createStore({
     },
     SET_COMMENTS(state, comments) {
       state.comments = comments;
+    },
+    ADD_POST(state, post) {
+      state.posts.unshift(post); // 将新帖子添加到列表的最前面
+    },
+    REMOVE_POST(state, postId) {
+      state.posts = state.posts.filter((p) => p.id !== postId);
+    },
+    ADD_COMMENT(state, comment) {
+      state.comments.push(comment);
+    },
+    SET_NOTIFICATION(state, message) {
+      state.notification = message;
+    },
+    CLEAR_NOTIFICATION(state) {
+      state.notification = null;
     },
   },
   actions: {
@@ -66,6 +87,44 @@ export default createStore({
     async fetchComments({ commit }, postId) {
       const response = await axios.get(`/api/posts/${postId}/comments`);
       commit("SET_COMMENTS", response.data);
+    },
+    // --- 新增 Actions ---
+    async createPost({ commit, dispatch }, postData) {
+      const response = await axios.post("/api/posts/", postData);
+      commit("ADD_POST", response.data);
+      dispatch("setNotification", "帖子发布成功！");
+    },
+    async deletePost({ commit, dispatch }, postId) {
+      try {
+        await axios.delete(`/api/posts/${postId}`);
+        commit("REMOVE_POST", postId);
+        dispatch("setNotification", "帖子删除成功！");
+      } catch (error) {
+        if (error.response?.status === 401) {
+          // Token 过期，清除本地存储并跳转到登录页
+          dispatch("logout");
+          dispatch("setNotification", "登录已过期，请重新登录");
+          // 可以在这里跳转到登录页
+          window.location.href = "/login";
+        } else {
+          console.error("删除帖子失败:", error);
+          dispatch("setNotification", "删除失败");
+        }
+      }
+    },
+    async createComment({ commit, dispatch }, { postId, content }) {
+      const response = await axios.post(`/api/posts/${postId}/comments`, {
+        content,
+      });
+      commit("ADD_COMMENT", response.data);
+      dispatch("setNotification", "评论发布成功！");
+    },
+    // 新增一个 action 用于管理通知的显示时间
+    setNotification({ commit }, message) {
+      commit("SET_NOTIFICATION", message);
+      setTimeout(() => {
+        commit("CLEAR_NOTIFICATION");
+      }, 3000); // 3秒后自动清除
     },
   },
   getters: {
