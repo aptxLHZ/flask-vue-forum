@@ -3,8 +3,21 @@ import { createRouter, createWebHistory } from "vue-router";
 // 导入我们新建的视图组件
 import RegisterView from "../views/Register.vue";
 import LoginView from "../views/Login.vue";
+import HomeView from "../views/Home.vue";
+import PostDetailView from "../views/PostDetail.vue";
 
 const routes = [
+  {
+    path: "/",
+    name: "home", //将根路径命名为home
+    component: HomeView,
+  },
+  {
+    path: "/post/:id",
+    name: "postDetail",
+    component: PostDetailView,
+    props: true,
+  },
   {
     path: "/register",
     name: "register",
@@ -14,11 +27,6 @@ const routes = [
     path: "/login",
     name: "login",
     component: LoginView,
-  },
-  // 我们可以加一个根路径重定向
-  {
-    path: "/",
-    redirect: "/login", // 暂时先让根路径跳转到登录页
   },
 ];
 
