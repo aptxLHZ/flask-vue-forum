@@ -113,7 +113,7 @@ export default createStore({
       }
     },
     async createComment({ commit, dispatch }, { postId, content }) {
-      const response = await axios.post(`/api/posts/${postId}/comments`, {
+      const response = await axios.post(`/posts/${postId}/comments`, {
         content,
       });
       commit("ADD_COMMENT", response.data);
