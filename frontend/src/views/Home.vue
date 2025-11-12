@@ -7,7 +7,7 @@
         <button>发布新帖子</button>
       </router-link>
     </div>
-    <!-- <h1 style="color: red; border: 2px solid red">论坛首页</h1> -->
+
     <div v-if="posts.length">
       <div v-for="post in posts" :key="post.id" class="post-item">
         <!-- 使用 router-link 跳转到帖子详情页 -->
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+// --- 修复点 1: 导入 mapGetters ---
 import { mapState, mapActions, mapGetters } from "vuex";
 
 export default {
@@ -34,7 +35,8 @@ export default {
   computed: {
     // 使用 mapState 辅助函数将 store 中的 posts 映射到组件的 computed 属性
     ...mapState(["posts"]),
-    ...mapGetters(["isLoggedIn"]), // 映射 getter
+    // --- 修复点 2: 映射 isLoggedIn getter ---
+    ...mapGetters(["isLoggedIn"]),
   },
   methods: {
     ...mapActions(["fetchPosts"]),
@@ -51,6 +53,19 @@ export default {
   max-width: 800px;
   margin: 20px auto;
 }
+
+/* --- 修复点 3: 添加 header 样式 --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.header h1 {
+  margin: 0;
+}
+/* ---------------------------------- */
+
 .post-item {
   border: 1px solid #eee;
   padding: 15px;
@@ -71,14 +86,5 @@ export default {
 }
 .post-item a:hover {
   text-decoration: underline;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-.header h1 {
-  margin: 0;
 }
 </style>

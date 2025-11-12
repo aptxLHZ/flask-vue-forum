@@ -1,17 +1,18 @@
 // frontend/src/router/index.js
 import { createRouter, createWebHistory } from "vue-router";
 import store from "../store";
-// 导入我们新建的视图组件
-import RegisterView from "../views/Register.vue";
-import LoginView from "../views/Login.vue";
+
+// --- 确保所有需要的视图组件都被导入 ---
 import HomeView from "../views/Home.vue";
 import PostDetailView from "../views/PostDetail.vue";
-import CreatePostView from "../views/CreatePost.vue";
+import RegisterView from "../views/Register.vue";
+import LoginView from "../views/Login.vue";
+import CreatePostView from "../views/CreatePost.vue"; // <<<--- 确保这一行存在！
 
 const routes = [
   {
     path: "/",
-    name: "home", //将根路径命名为home
+    name: "home",
     component: HomeView,
   },
   {
@@ -30,12 +31,14 @@ const routes = [
     name: "login",
     component: LoginView,
   },
+  // --- 核心修复点：添加这条路由规则！ ---
   {
     path: "/create-post",
-    name: "createPost",
+    name: "createPost", // <<<--- Vue Router 现在认识 'createPost' 这个名字了
     component: CreatePostView,
-    meta: { requiresAuth: true }, // 添加 meta 字段
+    meta: { requiresAuth: true }, // 别忘了权限控制
   },
+  // ------------------------------------
 ];
 
 const router = createRouter({
@@ -43,18 +46,16 @@ const router = createRouter({
   routes,
 });
 
-// --- 全局前置守卫 ---
+// --- 全局前置守卫 (确保它也存在) ---
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    // 如果路由需要认证
     if (!store.getters.isLoggedIn) {
-      // 但用户未登录
-      next({ name: "login" }); // 跳转到登录页
+      next({ name: "login" });
     } else {
-      next(); // 已登录，放行
+      next();
     }
   } else {
-    next(); // 不需要认证，直接放行
+    next();
   }
 });
 

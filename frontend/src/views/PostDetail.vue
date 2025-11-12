@@ -6,7 +6,7 @@
         作者: {{ post.author }} | 发布于:
         {{ new Date(post.timestamp).toLocaleString() }}
       </p>
-      <!-- 删除按钮，只有作者能看到 -->
+      <!-- 删除按钮 -->
       <button
         v-if="currentUser && currentUser.id === String(post.user_id)"
         @click="handleDeletePost"
@@ -26,7 +26,11 @@
       <h3>评论</h3>
       <!-- 发表评论表单 (登录后显示) -->
       <div v-if="isLoggedIn" class="comment-form">
-        <textarea v-model="newComment" placeholder="发表你的看法..."></textarea>
+        <textarea
+          v-model="newComment"
+          placeholder="发表你的看法..."
+          rows="4"
+        ></textarea>
         <button @click="submitComment">发表评论</button>
       </div>
       <!-- 评论列表 -->
@@ -47,6 +51,7 @@
 </template>
 
 <script>
+// --- 修复点 1: 导入 mapGetters ---
 import { mapState, mapActions, mapGetters } from "vuex";
 import { jwtDecode } from "jwt-decode";
 
@@ -54,7 +59,6 @@ export default {
   name: "PostDetailView",
   props: {
     id: {
-      // 接收来自路由的 id prop
       type: [String, Number],
       required: true,
     },
@@ -65,14 +69,16 @@ export default {
     };
   },
   computed: {
-    ...mapState(["post", "comments", "token"]), // 映射 token
+    ...mapState(["post", "comments", "token"]),
+    // --- 修复点 2: 映射 isLoggedIn getter ---
     ...mapGetters(["isLoggedIn"]),
     currentUser() {
       if (this.token) {
         try {
           const decoded = jwtDecode(this.token);
-          return { id: decoded.sub }; // 从 token 中解析出用户 ID
+          return { id: decoded.sub };
         } catch (e) {
+          console.error("Invalid token:", e);
           return null;
         }
       }
@@ -89,8 +95,11 @@ export default {
     async submitComment() {
       if (!this.newComment.trim()) return;
       try {
-        await this.createComment({ postId: this.id, content: this.newComment });
-        this.newComment = ""; // 清空输入框
+        await this.createComment({
+          postId: this.id,
+          content: this.newComment,
+        });
+        this.newComment = "";
       } catch (error) {
         console.error("评论失败:", error);
       }
@@ -99,7 +108,7 @@ export default {
       if (confirm("确定要删除这篇帖子吗？")) {
         try {
           await this.deletePost(this.id);
-          this.$router.push({ name: "home" }); // 删除后跳转回首页
+          this.$router.push({ name: "home" });
         } catch (error) {
           console.error("删除帖子失败:", error);
         }
@@ -107,7 +116,6 @@ export default {
     },
   },
   created() {
-    // 当组件创建时，使用 prop 'id' 来获取帖子和评论
     this.fetchPost(this.id);
     this.fetchComments(this.id);
   },
@@ -149,9 +157,18 @@ export default {
 }
 .comment-form textarea {
   width: 100%;
-  min-height: 80px;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 .comment-form button {
   margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>
